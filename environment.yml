@@ -9,6 +9,9 @@ dependencies:
   - jupyter
   - natsort
   - dash
+  - wandb
+  - python=3.8
+  - pip
   - pip:
           - PyWavelets
           - datajoint
