@@ -2,3 +2,6 @@ wandb/*
 artifacts/*
 build/*
 braivest.egg-info/*
+scripts*
+examples/.ipynb_checkpoints/*
+examples/wandb/*

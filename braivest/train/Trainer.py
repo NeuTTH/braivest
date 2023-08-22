@@ -1,14 +1,12 @@
-import tensorflow as tf
+import os
 import numpy as np
-import sys
-import wandb
+import tensorflow as tf
+
 from sklearn.model_selection import train_test_split
 from wandb.keras import WandbCallback
 from tensorflow.keras.callbacks import ModelCheckpoint
-import os
 from braivest.model.emgVAE import emgVAE
 from braivest.utils import load_data
-
 
 """
 kwargs...
@@ -20,7 +18,6 @@ so i can call it like this f(1, 2, a=2, b=2) and then kwargs inside is {"a":2, .
 
 give f(*args), then you can call it like this f(1,2,3,4) and then args is a list.
 """
-
 
 class Trainer():
 	"""
@@ -36,6 +33,7 @@ class Trainer():
 		"""
 		self.config = config
 		layers = [config.layer_dims for layer in range(config.num_layers)]
+		tf.random.set_seed(config.seed)
 		self.model = emgVAE(input_dim, config.latent, layers, config.kl, emg = config.emg)
 		self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=config.lr), loss='mse', metrics = ['mse'])
 

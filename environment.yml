@@ -1,18 +1,23 @@
 name: braivest
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - scikit-learn
   - plotly
   - yaml
   - matplotlib
+  - seaborn
   - jupyter
   - natsort
   - dash
-  - wandb
   - python=3.8
+  - cudatoolkit=11.2.*
+  - cudnn=8.1.*
   - pip
   - pip:
-          - PyWavelets
-          - datajoint
-prefix: /home/julia/miniconda3/envs/bs2
+    - wandb==0.12.4
+    - tensorflow==2.8.*
+    - tensorflow-probability==0.16.0
+    - PyWavelets
+    - datajoint

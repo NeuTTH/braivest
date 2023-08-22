@@ -1,7 +1,10 @@
+import os
+import wandb
+import numpy as np
+
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow_probability as tfp
-import numpy as np
 
 class emgVAE(keras.Model):
 	def __init__(self, input_dim, latent_dim, hidden_states, kl, emg = True):
@@ -73,6 +76,8 @@ class emgVAE(keras.Model):
 			neighbor_loss = tf.math.reduce_mean(tf.math.reduce_euclidean_norm(in_encodings - out_encodings, axis=1))
 			loss = self.compiled_loss(y, y_pred, regularization_losses=self.losses)
 
+
+		# wandb.log({'loss': loss, 'neighbor_loss': neighbor_loss})
 		# Compute gradients
 		trainable_vars = self.trainable_variables
 		gradients = tape.gradient(loss, trainable_vars)
@@ -86,6 +91,7 @@ class emgVAE(keras.Model):
 		metrics = {m.name: m.result() for m in self.metrics}
 		metrics['loss'] = self.loss_tracker.result()
 		metrics['neighbor_loss'] = self.neighbor_loss_tracker.result()
+
 		return metrics
 
 	@property
@@ -99,6 +105,7 @@ class emgVAE(keras.Model):
 		out_encodings = self.encode(y)
 		neighbor_loss = tf.math.reduce_mean(tf.math.reduce_euclidean_norm(in_encodings - out_encodings, axis=1))/tf.math.reduce_mean(tf.math.reduce_euclidean_norm(in_encodings, axis=1))
 		loss = self.compiled_loss(y, y_pred, regularization_losses=self.losses)
+		# wandb.log({'val_loss': loss, 'val_neighbor_loss': neighbor_loss})
 		self.loss_tracker.update_state(loss)
 		self.neighbor_loss_tracker.update_state(neighbor_loss)
 		self.mse.update_state(y, y_pred)

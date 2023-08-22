@@ -65,10 +65,10 @@ class CustomWandbCallback(keras.callbacks.Callback):
             encodings = self.get_encodings()
             if self.plot:
                 fig = plot_encodings(encodings, "Val Plot", hypno=self.hypno)
-                wandb.log({"epoch": epoch, "encodings": fig}, commit=False)
+                wandb.log({"epoch": epoch, "encodings": fig})
             if self.hypno is not None:
-                wandb.log(distribution_metrics_labels(encodings, self.hypno), commit=False)
-            wandb.log({'entropy': get_entropy(encodings)}, commit=False)
+                wandb.log(distribution_metrics_labels(encodings, self.hypno))
+            wandb.log({'entropy': get_entropy(encodings)})
 
     def get_encodings(self):
         print(self.validation_data[0].shape)
