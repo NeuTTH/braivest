@@ -5,3 +5,6 @@ braivest.egg-info/*
 scripts*
 examples/.ipynb_checkpoints/*
 examples/wandb/*
+*.h5
+*.npy
+*.pickle

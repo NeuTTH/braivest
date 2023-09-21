@@ -47,10 +47,16 @@ class Trainer():
 		if self.config.time:
 			train_X = load_data(dataset_dir, 'train.npy')
 			train_Y = load_data(dataset_dir, 'train_Y.npy')
-			train_set = (train_X, train_Y)
+			if self.config.w_label:
+				train_set = (train_X[:, :-1], train_Y[:, :-1])
+			else:
+				train_set = (train_X, train_Y)
 		else:
 			train_X = load_data(dataset_dir, 'train.npy')
-			train_set = (train_X, train_X)
+			if self.config.w_label:
+				train_set = (train_X[:, :-1], train_X[:, :-1])
+			else:
+				train_set = (train_X, train_X)
 		x_train, x_val, y_train, y_val = train_test_split(train_set[0], train_set[1], test_size=val_size, shuffle=True)
 		self.train_set = (x_train, y_train)
 		self.val_set = (x_val, y_val)
@@ -80,7 +86,10 @@ class Trainer():
 			if save_dir is None:
 					print("No save directory provided!")
 			else:
-				save_callback = tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir, "model_{epoch:02d}.h5"), save_weights_only=True, save_best_only=save_best_only, **save_kwargs)
+				save_callback = tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir, "model_best.h5"), 
+                                                       monitor = 'val_mse', mode = 'min',
+                                                       save_weights_only=True, 
+                                                       save_best_only=save_best_only, **save_kwargs)
 				callbacks.append(save_callback)
 		history = self.model.fit(self.train_set[0], self.train_set[1], epochs=self.config.epochs, batch_size=self.config.batch_size,
 				validation_data=self.val_set, callbacks=callbacks, **train_kwargs)

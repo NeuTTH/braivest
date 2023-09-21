@@ -34,25 +34,25 @@ def get_entropy(encodings):
      return entropy(np.exp(log_density))
 
 
-def plot_encodings(encodings, title, hypno=None):
-        hypno_unique = np.unique(hypno)
-        #legend = {hypno_unique[0]:'REM',hypno_unique[1]:'SWS',hypno_unique[2]:'Wake'}
-        #if hypno_unique.shape[0] > 3:
-            #legend[hypno_unique[3]] = 'X'
-        if hypno is not None:
-            length = min(len(hypno), encodings.shape[0])
-            if encodings.shape[1] == 3:
-                fig = px.scatter_3d(encodings[:length, :], x=0, y=1, z=2, color=hypno[:length])
-            else:
-                fig = px.scatter(encodings[:length, :], x=0, y=1, color=hypno[:length])
-            #fig = px.scatter(encodings, x=0, y=1, color = [legend[i] for i in hypno], labels = legend)
+def plot_encodings(encodings, hypno=None):
+    hypno_unique = np.unique(hypno)
+    legend = {hypno_unique[0]:'REM',hypno_unique[1]:'SWS',hypno_unique[2]:'Wake'}
+    if hypno_unique.shape[0] > 3:
+        legend[hypno_unique[3]] = 'X'
+    if hypno is not None:
+        length = min(len(hypno), encodings.shape[0])
+        if encodings.shape[1] == 3:
+            fig = px.scatter_3d(encodings[:length, :], x=0, y=1, z=2, color=hypno[:length])
         else:
-            if encodings.shape[1] == 3:
-                fig  = px.scatter_3d(encodings, x=0, y=1, z=2)
-            else:
-                fig = px.scatter(encodings, x=0, y=1)
-        fig.update_traces(marker=dict(size=5, opacity=0.5))
-        return fig
+            fig = px.scatter(encodings[:length, :], x=0, y=1, color=hypno[:length])
+        fig = px.scatter(encodings, x=0, y=1, color = [legend[i] for i in hypno], labels = legend)
+    else:
+        if encodings.shape[1] == 3:
+            fig  = px.scatter_3d(encodings, x=0, y=1, z=2)
+        else:
+            fig = px.scatter(encodings, x=0, y=1)
+    fig.update_traces(marker=dict(size=5, opacity=0.5))
+    return fig
 
 class CustomWandbCallback(keras.callbacks.Callback):
     def __init__(self, validation_data, hypno, plot = False):
@@ -64,7 +64,7 @@ class CustomWandbCallback(keras.callbacks.Callback):
         if epoch < 10 or epoch % 20 == 0:
             encodings = self.get_encodings()
             if self.plot:
-                fig = plot_encodings(encodings, "Val Plot", hypno=self.hypno)
+                fig = plot_encodings(encodings, hypno=self.hypno)
                 wandb.log({"epoch": epoch, "encodings": fig})
             if self.hypno is not None:
                 wandb.log(distribution_metrics_labels(encodings, self.hypno))
